@@ -6,339 +6,664 @@
     <title>Product Gallery</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body class="min-h-full w-full bg-white p-4 md:p-6">
+<body class="min-h-full w-full bg-white md:p-1">
+    <nav class="relative w-full bg-white">
+        <!-- Pattern Background -->
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute inset-0 bg-gradient-to-b from-opacity-40 to-opacity-10" style="background-image: url('data:image/svg+xml,%3Csvg width=\'20\' height=\'20\' viewBox=\'0 0 20 20\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23000000\' fill-opacity=\'0.4\' fill-rule=\'evenodd\'%3E%3Ccircle cx=\'3\' cy=\'3\' r=\'3\'/%3E%3Ccircle cx=\'13\' cy=\'13\' r=\'3\'/%3E%3C/g%3E%3C/svg%3E');"></div>
+        </div>
+
+        <!-- Nav Content -->
+        <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="flex h-24 items-center justify-between">
+                <!-- Logo -->
+                <div class="flex-shrink-0">
+                    <img class="h-8 w-8 rounded" src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Logo">
+                </div>
+
+                <!-- Page Title -->
+                <div class="flex flex-col items-center">
+                    <h1 class="font-serif text-3xl font-extrabold tracking-tight text-gray-900">
+                        Product Gallery
+                    </h1>
+                    <span class="text-sm font-medium text-gray-500">Discover Amazing Products</span>
+                </div>
+
+                <!-- Right side spacer to maintain centering -->
+                <div class="flex-shrink-0 w-8"></div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Search and Filter Bar -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-6">
+        <div class="flex gap-4">
+            <!-- Category Dropdown -->
+            <div class="relative w-48">
+                <button id="categoryDropdown" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white flex items-center justify-between"
+                        onclick="toggleCategoryDropdown()">
+                    <span id="selectedCategory">All Categories</span>
+                    <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+                <div id="categoryList" 
+                     class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg hidden">
+                </div>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="relative flex-1">
+                <input type="text" 
+                       id="searchInput" 
+                       placeholder="Search products by name or code..." 
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+                       onkeyup="handleSearch()"
+                       onfocus="showSearchSuggestions()"
+                       onblur="hideSearchSuggestions()">
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                    <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <!-- Search Suggestions Dropdown -->
+                <div id="searchSuggestions" 
+                     class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto">
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <div id="app"></div>
     <script>
         const productsData = [
             {
                 id: 1,
                 name: "Classic Leather Sneakers",
+                category: "Footwear",
                 variants: [
                     {
                         id: 1,
                         name: "White",
+                        code: "SN001-WHT",
                         images: [
-                            { url: "https://images.unsplash.com/photo-1600269452121-4f2416e55c28?ixlib=rb-4.0.3", alt: "White sneaker front view" },
-                            { url: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?ixlib=rb-4.0.3", alt: "White sneaker side view" },
-                            { url: "https://images.unsplash.com/photo-1603808033192-082d6919d3e1?ixlib=rb-4.0.3", alt: "White sneaker back view" }
+                            { url: "https://images.meesho.com/images/products/443449067/h1du9_512.webp", alt: "White sneaker front view" },
+                            { url: "https://images.meesho.com/images/products/443449067/yktv9_512.webp", alt: "White sneaker side view" },
+                            { url: "https://images.meesho.com/images/products/443449067/wro1j_512.webp", alt: "White sneaker back view" }
                         ],
                         affiliateLinks: [{
-      name: "Amazon",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/4/4a/Amazon_icon.svg",
-      url: "#",
-      price: "$99.99",
-      rating: {
-        score: 4.5,
-        totalReviews: 2543
-      },
-      delivery: {
-        type: "Prime",
-        estimatedDays: "2-3 days",
-        isFree: true
-      }
-    }, {
-      name: "Nike",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg",
-      url: "#",
-      price: "$89.99",
-      rating: {
-        score: 4.8,
-        totalReviews: 1234
-      },
-      delivery: {
-        type: "Standard",
-        estimatedDays: "3-5 days",
-        isFree: false
-      }
-    }]
+                            name: "Amazon",
+                            logo: "https://upload.wikimedia.org/wikipedia/commons/4/4a/Amazon_icon.svg",
+                            url: "#",
+                            price: "$99.99",
+                            coupon: {
+                                code: "SAVE20",
+                                discount: "20% OFF"
+                            },
+                            rating: {
+                                score: 4.5,
+                                totalReviews: 2543
+                            },
+                            delivery: {
+                                type: "Prime",
+                                estimatedDays: "2-3 days",
+                                isFree: true
+                            }
+                        }, {
+                            name: "Nike",
+                            logo: "https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg",
+                            url: "#",
+                            price: "$89.99",
+                            coupon: {
+                                code: "NIKE15",
+                                discount: "15% OFF"
+                            },
+                            rating: {
+                                score: 4.8,
+                                totalReviews: 1234
+                            },
+                            delivery: {
+                                type: "Standard",
+                                estimatedDays: "3-5 days",
+                                isFree: false
+                            }
+                        }]
                     },
                     {
                         id: 2,
                         name: "Black",
+                        code: "SN001-BLK",
                         images: [
                             { url: "https://images.unsplash.com/photo-1491553895911-0055eca6402d?ixlib=rb-4.0.3", alt: "Black sneaker front view" },
                             { url: "https://images.unsplash.com/photo-1607522370275-f14206abe5d3?ixlib=rb-4.0.3", alt: "Black sneaker side view" },
                             { url: "https://images.unsplash.com/photo-1608231387042-66d1773070a5?ixlib=rb-4.0.3", alt: "Black sneaker back view" }
                         ],
                         affiliateLinks: [{
-      name: "Amazon",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/4/4a/Amazon_icon.svg",
-      url: "#",
-      price: "$99.99",
-      rating: {
-        score: 4.5,
-        totalReviews: 2543
-      },
-      delivery: {
-        type: "Prime",
-        estimatedDays: "2-3 days",
-        isFree: true
-      }
-    }, {
-      name: "Nike",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg",
-      url: "#",
-      price: "$89.99",
-      rating: {
-        score: 4.8,
-        totalReviews: 1234
-      },
-      delivery: {
-        type: "Standard",
-        estimatedDays: "3-5 days",
-        isFree: false
-      }
-    }]
+                            name: "Amazon",
+                            logo: "https://upload.wikimedia.org/wikipedia/commons/4/4a/Amazon_icon.svg",
+                            url: "#",
+                            price: "$99.99",
+                            coupon: {
+                                code: "SAVE20",
+                                discount: "20% OFF"
+                            },
+                            rating: {
+                                score: 4.5,
+                                totalReviews: 2543
+                            },
+                            delivery: {
+                                type: "Prime",
+                                estimatedDays: "2-3 days",
+                                isFree: true
+                            }
+                        }, {
+                            name: "Nike",
+                            logo: "https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg",
+                            url: "#",
+                            price: "$89.99",
+                            coupon: {
+                                code: "NIKE15",
+                                discount: "15% OFF"
+                            },
+                            rating: {
+                                score: 4.8,
+                                totalReviews: 1234
+                            },
+                            delivery: {
+                                type: "Standard",
+                                estimatedDays: "3-5 days",
+                                isFree: false
+                            }
+                        }]
                     }
                 ]
             },
             {
                 id: 2,
                 name: "Classic Leather Sneakers",
+                category: "Fashion",
                 variants: [
                     {
                         id: 1,
                         name: "White",
+                        code: "SN002-WHT",
                         images: [
                             { url: "https://images.unsplash.com/photo-1600269452121-4f2416e55c28?ixlib=rb-4.0.3", alt: "White sneaker front view" },
                             { url: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?ixlib=rb-4.0.3", alt: "White sneaker side view" },
                             { url: "https://images.unsplash.com/photo-1603808033192-082d6919d3e1?ixlib=rb-4.0.3", alt: "White sneaker back view" }
                         ],
                         affiliateLinks: [{
-      name: "Amazon",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/4/4a/Amazon_icon.svg",
-      url: "#",
-      price: "$99.99",
-      rating: {
-        score: 4.5,
-        totalReviews: 2543
-      },
-      delivery: {
-        type: "Prime",
-        estimatedDays: "2-3 days",
-        isFree: true
-      }
-    }, {
-      name: "Nike",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg",
-      url: "#",
-      price: "$89.99",
-      rating: {
-        score: 4.8,
-        totalReviews: 1234
-      },
-      delivery: {
-        type: "Standard",
-        estimatedDays: "3-5 days",
-        isFree: false
-      }
-    }]
+                            name: "Amazon",
+                            logo: "https://upload.wikimedia.org/wikipedia/commons/4/4a/Amazon_icon.svg",
+                            url: "#",
+                            price: "$99.99",
+                            coupon: {
+                                code: "SAVE20",
+                                discount: "20% OFF"
+                            },
+                            rating: {
+                                score: 4.5,
+                                totalReviews: 2543
+                            },
+                            delivery: {
+                                type: "Prime",
+                                estimatedDays: "2-3 days",
+                                isFree: true
+                            }
+                        }, {
+                            name: "Nike",
+                            logo: "https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg",
+                            url: "#",
+                            price: "$89.99",
+                            coupon: {
+                                code: "NIKE15",
+                                discount: "15% OFF"
+                            },
+                            rating: {
+                                score: 4.8,
+                                totalReviews: 1234
+                            },
+                            delivery: {
+                                type: "Standard",
+                                estimatedDays: "3-5 days",
+                                isFree: false
+                            }
+                        }]
                     },
                     {
                         id: 2,
                         name: "Black",
+                        code: "SN002-BLK",
                         images: [
                             { url: "https://images.unsplash.com/photo-1491553895911-0055eca6402d?ixlib=rb-4.0.3", alt: "Black sneaker front view" },
                             { url: "https://images.unsplash.com/photo-1607522370275-f14206abe5d3?ixlib=rb-4.0.3", alt: "Black sneaker side view" },
                             { url: "https://images.unsplash.com/photo-1608231387042-66d1773070a5?ixlib=rb-4.0.3", alt: "Black sneaker back view" }
                         ],
                         affiliateLinks: [{
-      name: "Amazon",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/4/4a/Amazon_icon.svg",
-      url: "#",
-      price: "$99.99",
-      rating: {
-        score: 4.5,
-        totalReviews: 2543
-      },
-      delivery: {
-        type: "Prime",
-        estimatedDays: "2-3 days",
-        isFree: true
-      }
-    }, {
-      name: "Nike",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg",
-      url: "#",
-      price: "$89.99",
-      rating: {
-        score: 4.8,
-        totalReviews: 1234
-      },
-      delivery: {
-        type: "Standard",
-        estimatedDays: "3-5 days",
-        isFree: false
-      }
-    }]
+                            name: "Amazon",
+                            logo: "https://upload.wikimedia.org/wikipedia/commons/4/4a/Amazon_icon.svg",
+                            url: "#",
+                            price: "$99.99",
+                            coupon: {
+                                code: "SAVE20",
+                                discount: "20% OFF"
+                            },
+                            rating: {
+                                score: 4.5,
+                                totalReviews: 2543
+                            },
+                            delivery: {
+                                type: "Prime",
+                                estimatedDays: "2-3 days",
+                                isFree: true
+                            }
+                        }, {
+                            name: "Nike",
+                            logo: "https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg",
+                            url: "#",
+                            price: "$89.99",
+                            coupon: {
+                                code: "NIKE15",
+                                discount: "15% OFF"
+                            },
+                            rating: {
+                                score: 4.8,
+                                totalReviews: 1234
+                            },
+                            delivery: {
+                                type: "Standard",
+                                estimatedDays: "3-5 days",
+                                isFree: false
+                            }
+                        }]
                     }
                 ]
             },
             {
                 id: 3,
                 name: "Classic Leather Sneakers",
+                category: "Footwear",
                 variants: [
                     {
                         id: 1,
                         name: "White",
+                        code: "SN003-WHT",
                         images: [
                             { url: "https://images.unsplash.com/photo-1600269452121-4f2416e55c28?ixlib=rb-4.0.3", alt: "White sneaker front view" },
                             { url: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?ixlib=rb-4.0.3", alt: "White sneaker side view" },
                             { url: "https://images.unsplash.com/photo-1603808033192-082d6919d3e1?ixlib=rb-4.0.3", alt: "White sneaker back view" }
                         ],
                         affiliateLinks: [{
-      name: "Amazon",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/4/4a/Amazon_icon.svg",
-      url: "#",
-      price: "$99.99",
-      rating: {
-        score: 4.5,
-        totalReviews: 2543
-      },
-      delivery: {
-        type: "Prime",
-        estimatedDays: "2-3 days",
-        isFree: true
-      }
-    }, {
-      name: "Nike",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg",
-      url: "#",
-      price: "$89.99",
-      rating: {
-        score: 4.8,
-        totalReviews: 1234
-      },
-      delivery: {
-        type: "Standard",
-        estimatedDays: "3-5 days",
-        isFree: false
-      }
-    }]
+                            name: "Amazon",
+                            logo: "https://upload.wikimedia.org/wikipedia/commons/4/4a/Amazon_icon.svg",
+                            url: "#",
+                            price: "$99.99",
+                            coupon: {
+                                code: "SAVE20",
+                                discount: "20% OFF"
+                            },
+                            rating: {
+                                score: 4.5,
+                                totalReviews: 2543
+                            },
+                            delivery: {
+                                type: "Prime",
+                                estimatedDays: "2-3 days",
+                                isFree: true
+                            }
+                        }, {
+                            name: "Nike",
+                            logo: "https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg",
+                            url: "#",
+                            price: "$89.99",
+                            coupon: {
+                                code: "NIKE15",
+                                discount: "15% OFF"
+                            },
+                            rating: {
+                                score: 4.8,
+                                totalReviews: 1234
+                            },
+                            delivery: {
+                                type: "Standard",
+                                estimatedDays: "3-5 days",
+                                isFree: false
+                            }
+                        }]
                     },
                     {
                         id: 2,
                         name: "Black",
+                        code: "SN003-BLK",
                         images: [
                             { url: "https://images.unsplash.com/photo-1491553895911-0055eca6402d?ixlib=rb-4.0.3", alt: "Black sneaker front view" },
                             { url: "https://images.unsplash.com/photo-1607522370275-f14206abe5d3?ixlib=rb-4.0.3", alt: "Black sneaker side view" },
                             { url: "https://images.unsplash.com/photo-1608231387042-66d1773070a5?ixlib=rb-4.0.3", alt: "Black sneaker back view" }
                         ],
                         affiliateLinks: [{
-      name: "Amazon",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/4/4a/Amazon_icon.svg",
-      url: "#",
-      price: "$99.99",
-      rating: {
-        score: 4.5,
-        totalReviews: 2543
-      },
-      delivery: {
-        type: "Prime",
-        estimatedDays: "2-3 days",
-        isFree: true
-      }
-    }, {
-      name: "Nike",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg",
-      url: "#",
-      price: "$89.99",
-      rating: {
-        score: 4.8,
-        totalReviews: 1234
-      },
-      delivery: {
-        type: "Standard",
-        estimatedDays: "3-5 days",
-        isFree: false
-      }
-    }]
+                            name: "Amazon",
+                            logo: "https://upload.wikimedia.org/wikipedia/commons/4/4a/Amazon_icon.svg",
+                            url: "#",
+                            price: "$99.99",
+                            coupon: {
+                                code: "SAVE20",
+                                discount: "20% OFF"
+                            },
+                            rating: {
+                                score: 4.5,
+                                totalReviews: 2543
+                            },
+                            delivery: {
+                                type: "Prime",
+                                estimatedDays: "2-3 days",
+                                isFree: true
+                            }
+                        }, {
+                            name: "Nike",
+                            logo: "https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg",
+                            url: "#",
+                            price: "$89.99",
+                            coupon: {
+                                code: "NIKE15",
+                                discount: "15% OFF"
+                            },
+                            rating: {
+                                score: 4.8,
+                                totalReviews: 1234
+                            },
+                            delivery: {
+                                type: "Standard",
+                                estimatedDays: "3-5 days",
+                                isFree: false
+                            }
+                        }]
                     }
                 ]
             },
             {
                 id: 4,
                 name: "Classic Leather Sneakers",
+                category: "Footwear",
                 variants: [
                     {
                         id: 1,
                         name: "White",
+                        code: "SN004-WHT",
                         images: [
                             { url: "https://images.unsplash.com/photo-1600269452121-4f2416e55c28?ixlib=rb-4.0.3", alt: "White sneaker front view" },
                             { url: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?ixlib=rb-4.0.3", alt: "White sneaker side view" },
                             { url: "https://images.unsplash.com/photo-1603808033192-082d6919d3e1?ixlib=rb-4.0.3", alt: "White sneaker back view" }
                         ],
                         affiliateLinks: [{
-      name: "Amazon",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/4/4a/Amazon_icon.svg",
-      url: "#",
-      price: "$99.99",
-      rating: {
-        score: 4.5,
-        totalReviews: 2543
-      },
-      delivery: {
-        type: "Prime",
-        estimatedDays: "2-3 days",
-        isFree: true
-      }
-    }, {
-      name: "Nike",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg",
-      url: "#",
-      price: "$89.99",
-      rating: {
-        score: 4.8,
-        totalReviews: 1234
-      },
-      delivery: {
-        type: "Standard",
-        estimatedDays: "3-5 days",
-        isFree: false
-      }
-    }]
+                            name: "Amazon",
+                            logo: "https://upload.wikimedia.org/wikipedia/commons/4/4a/Amazon_icon.svg",
+                            url: "#",
+                            price: "$99.99",
+                            coupon: {
+                                code: "SAVE20",
+                                discount: "20% OFF"
+                            },
+                            rating: {
+                                score: 4.5,
+                                totalReviews: 2543
+                            },
+                            delivery: {
+                                type: "Prime",
+                                estimatedDays: "2-3 days",
+                                isFree: true
+                            }
+                        }, {
+                            name: "Nike",
+                            logo: "https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg",
+                            url: "#",
+                            price: "$89.99",
+                            coupon: {
+                                code: "NIKE15",
+                                discount: "15% OFF"
+                            },
+                            rating: {
+                                score: 4.8,
+                                totalReviews: 1234
+                            },
+                            delivery: {
+                                type: "Standard",
+                                estimatedDays: "3-5 days",
+                                isFree: false
+                            }
+                        }]
                     },
                     {
                         id: 2,
                         name: "Black",
+                        code: "SN004-BLK",
                         images: [
                             { url: "https://images.unsplash.com/photo-1491553895911-0055eca6402d?ixlib=rb-4.0.3", alt: "Black sneaker front view" },
                             { url: "https://images.unsplash.com/photo-1607522370275-f14206abe5d3?ixlib=rb-4.0.3", alt: "Black sneaker side view" },
                             { url: "https://images.unsplash.com/photo-1608231387042-66d1773070a5?ixlib=rb-4.0.3", alt: "Black sneaker back view" }
                         ],
                         affiliateLinks: [{
-      name: "Amazon",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/4/4a/Amazon_icon.svg",
-      url: "#",
-      price: "$99.99",
-      rating: {
-        score: 4.5,
-        totalReviews: 2543
-      },
-      delivery: {
-        type: "Prime",
-        estimatedDays: "2-3 days",
-        isFree: true
-      }
-    }, {
-      name: "Nike",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg",
-      url: "#",
-      price: "$89.99",
-      rating: {
-        score: 4.8,
-        totalReviews: 1234
-      },
-      delivery: {
-        type: "Standard",
-        estimatedDays: "3-5 days",
-        isFree: false
-      }
-    }]
+                            name: "Amazon",
+                            logo: "https://upload.wikimedia.org/wikipedia/commons/4/4a/Amazon_icon.svg",
+                            url: "#",
+                            price: "$99.99",
+                            coupon: {
+                                code: "SAVE20",
+                                discount: "20% OFF"
+                            },
+                            rating: {
+                                score: 4.5,
+                                totalReviews: 2543
+                            },
+                            delivery: {
+                                type: "Prime",
+                                estimatedDays: "2-3 days",
+                                isFree: true
+                            }
+                        }, {
+                            name: "Nike",
+                            logo: "https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg",
+                            url: "#",
+                            price: "$89.99",
+                            coupon: {
+                                code: "NIKE15",
+                                discount: "15% OFF"
+                            },
+                            rating: {
+                                score: 4.8,
+                                totalReviews: 1234
+                            },
+                            delivery: {
+                                type: "Standard",
+                                estimatedDays: "3-5 days",
+                                isFree: false
+                            }
+                        }]
                     }
                 ]
             }
         ];
+
+        // Category Filter functionality
+        let selectedCategory = 'All Categories';
+
+        function initializeCategoryFilter() {
+            const categories = ['All Categories', ...new Set(productsData.map(product => product.category))];
+            const categoryList = document.getElementById('categoryList');
+            
+            categoryList.innerHTML = categories.map(category => `
+                <div class="px-4 py-2 hover:bg-gray-100 cursor-pointer" 
+                     onclick="selectCategory('${category}')">
+                    ${category}
+                </div>
+            `).join('');
+        }
+
+        function toggleCategoryDropdown() {
+            const dropdown = document.getElementById('categoryList');
+            dropdown.classList.toggle('hidden');
+        }
+
+        function selectCategory(category) {
+            selectedCategory = category;
+            document.getElementById('selectedCategory').textContent = category;
+            toggleCategoryDropdown();
+            handleSearch();
+        }
+
+        // Enhanced Search functionality
+        function showSearchSuggestions() {
+            const searchInput = document.getElementById('searchInput');
+            const suggestionsDiv = document.getElementById('searchSuggestions');
+            
+            if (searchInput.value.length > 0) {
+                updateSearchSuggestions();
+            }
+            
+            suggestionsDiv.classList.remove('hidden');
+        }
+
+        function hideSearchSuggestions() {
+            setTimeout(() => {
+                document.getElementById('searchSuggestions').classList.add('hidden');
+            }, 200);
+        }
+
+        function updateSearchSuggestions() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const suggestionsDiv = document.getElementById('searchSuggestions');
+            
+            const suggestions = productsData.reduce((acc, product) => {
+                if (selectedCategory === 'All Categories' || product.category === selectedCategory) {
+                    // Add product name if it matches
+                    if (product.name.toLowerCase().includes(searchTerm)) {
+                        acc.push({ text: product.name, type: 'Product' });
+                    }
+                    
+                    // Add variant codes if they match
+                    product.variants.forEach(variant => {
+                        if (variant.code.toLowerCase().includes(searchTerm)) {
+                            acc.push({ text: variant.code, type: 'Code', product: product.name });
+                        }
+                    });
+                }
+                return acc;
+            }, []);
+
+            if (suggestions.length > 0) {
+                suggestionsDiv.innerHTML = suggestions.map(suggestion => `
+                    <div class="px-4 py-2 hover:bg-gray-100 cursor-pointer" 
+                         onclick="selectSuggestion('${suggestion.text}')">
+                        <div class="flex justify-between">
+                            <span>${suggestion.text}</span>
+                            <span class="text-gray-500 text-sm">
+                                ${suggestion.type === 'Code' ? `${suggestion.product} - Code` : 'Product'}
+                            </span>
+                        </div>
+                    </div>
+                `).join('');
+                suggestionsDiv.classList.remove('hidden');
+            } else {
+                suggestionsDiv.innerHTML = `
+                    <div class="px-4 py-2 text-gray-500">
+                        No matches found
+                    </div>
+                `;
+            }
+        }
+
+        function selectSuggestion(text) {
+            document.getElementById('searchInput').value = text;
+            handleSearch();
+            hideSearchSuggestions();
+        }
+
+        function handleSearch() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            let filteredProducts = productsData;
+            
+            // Apply category filter
+            if (selectedCategory !== 'All Categories') {
+                filteredProducts = filteredProducts.filter(product => 
+                    product.category === selectedCategory
+                );
+            }
+            
+            // Apply search term filter
+            if (searchTerm) {
+                filteredProducts = filteredProducts.filter(product => {
+                    const matchName = product.name.toLowerCase().includes(searchTerm);
+                    const matchVariants = product.variants.some(variant => 
+                        variant.code.toLowerCase().includes(searchTerm)
+                    );
+                    return matchName || matchVariants;
+                });
+            }
+
+            renderFilteredProducts(filteredProducts);
+        }
+
+        // Initialize the category filter when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeCategoryFilter();
+            renderApp();
+        });
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', (event) => {
+            const categoryDropdown = document.getElementById('categoryDropdown');
+            const categoryList = document.getElementById('categoryList');
+            
+            if (!categoryDropdown.contains(event.target)) {
+                categoryList.classList.add('hidden');
+            }
+        });
+
+        function renderFilteredProducts(products) {
+            appContainer.innerHTML = `
+                <div class="min-h-full w-full bg-white">
+                    <div class="mx-auto max-w-7xl">
+                        ${products.length === 0 ? `
+                            <div class="text-center py-10">
+                                <p class="text-gray-500 text-lg">No products found matching your search.</p>
+                            </div>
+                        ` : `
+                            <div class="grid gap-2 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+                                ${products.map(product => `
+                                    <div class="rounded-xl p-0.5 bg-transparent">
+                                        <div class="flex justify-between items-center mb-4">
+                                            <h2 class="text-2xl font-semibold text-gray-800 tracking-tight hover:text-gray-900 transition-colors duration-200">
+                                                ${product.name}
+                                            </h2>
+                                            <span class="text-sm text-gray-500">${product.category}</span>
+                                        </div>
+                                        <div class="text-sm text-gray-500 mb-2">
+                                            Codes: ${product.variants.map(v => v.code).join(', ')}
+                                        </div>
+                                        <div class="space-y-4">
+                                            ${createImageGalleryHTML(product.id)}
+                                            <div class="flex gap-2 overflow-x-auto">
+                                                ${product.variants.map(variant => `
+                                                    <button onclick="handleVariantSelect(${product.id}, ${variant.id})" 
+                                                            class="flex-none ${selectedVariants[product.id].variant.id === variant.id ? "ring-2 ring-black" : ""}">
+                                                        <img src="${variant.images[0].url}" 
+                                                             alt="${variant.name}" 
+                                                             class="h-16 w-16 rounded-md object-cover object-center" />
+                                                    </button>
+                                                `).join('')}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            ${createAffiliateLinkHTML(product.id)}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `}
+                    </div>
+                </div>
+            `;
+        }
 
         const appContainer = document.getElementById('app');
         let selectedVariants = productsData.reduce(
@@ -358,12 +683,12 @@
 
         function renderApp() {
             appContainer.innerHTML = `
-                <div class="min-h-full w-full bg-white p-4 md:p-6">
+                <div class="min-h-full w-full bg-white ">
                     <div class="mx-auto max-w-7xl">
-                        <div class="grid gap-8 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+                        <div class="grid gap-2 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
                             ${productsData.map(product => `
-                                <div class="border rounded-xl p-4 bg-white shadow-sm">
-                                    <h2 class="mb-4 text-xl font-bold">${product.name}</h2>
+                                <div class=" rounded-xl p-0.5 bg-transparent">
+                                    <h2 class="mb-4 text-2xl font-semibold text-gray-800 tracking-tight hover:text-gray-900 transition-colors duration-200 text-center">${product.name}</h2>
                                     <div class="space-y-4">
                                         <div id="gallery-${product.id}">
                                             ${createImageGalleryHTML(product.id)}
@@ -388,6 +713,7 @@
                 </div>
             `;
         }
+
         function formatReviewCount(count) {
             if (count >= 1000000) {
                 return `${(count / 1000000).toFixed(1)}M`;
@@ -443,6 +769,17 @@
                                     <img src="${link.logo}" alt="${link.name}" class="h-8 w-8 object-contain" />
                                     <span class="font-medium">${link.name}</span>
                                 </div>
+                                ${link.coupon ? `
+                                    <div class="flex items-center gap-2 bg-yellow-50 px-3 py-1 rounded-lg">
+                                        <svg class="h-5 w-5 text-yellow-600" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M5.5 3A2.5 2.5 0 003 5.5v2.879a2.5 2.5 0 00.732 1.767l6.5 6.5a2.5 2.5 0 003.536 0l2.878-2.878a2.5 2.5 0 000-3.536l-6.5-6.5A2.5 2.5 0 008.38 3H5.5zM6 7a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                                        </svg>
+                                        <div class="flex flex-col">
+                                            <span class="text-sm font-semibold text-yellow-800">${link.coupon.code}</span>
+                                            <span class="text-xs text-yellow-600">${link.coupon.discount}</span>
+                                        </div>
+                                    </div>
+                                ` : ''}
                                 <span class="font-semibold">${link.price}</span>
                             </div>
                             <div class="flex items-center justify-between text-sm">
@@ -494,9 +831,9 @@
                         <img src="${images[currentIndex].url}" alt="${images[currentIndex].alt}" class="h-full w-full object-cover object-center" />
                         <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center gap-2">${indicatorsHTML}</div>
                         <button class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full" aria-label="Previous"
-                                onclick="prevImage(${productId})">&#9664;</button>
+                                onclick="prevImage(${productId})">&lt;</button>
                         <button class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full" aria-label="Next"
-                                onclick="nextImage(${productId})">&#9654;</button>
+                                onclick="nextImage(${productId})">&gt;</button>
                     </div>
                 </div>
             `;
